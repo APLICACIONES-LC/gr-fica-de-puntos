@@ -1,0 +1,619 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Login;
+
+import Clases.PRESION;
+import Clases.PT100_GENERADOR;
+import Clases.TERMISTOR_GENERADOR;
+import Conexion_bd.Conectar;
+import com.panamahitek.ArduinoException;
+import com.panamahitek.PanamaHitek_Arduino;
+
+import USUARIO.Paciente_existente;
+import java.awt.Color;
+import java.awt.Event;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DecimalFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
+import solo_administrador.admin_presion;
+
+/**
+ *
+ * @author ERICK IVAN
+ */
+public class LOGIN extends javax.swing.JFrame {
+
+    PanamaHitek_Arduino Arduino = new PanamaHitek_Arduino();
+int max1=0;
+int max2=0;
+    public LOGIN() {
+        initComponents();
+//        Image icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/iconfel.png"));
+//       setIconImage(icon);
+//setVisible(true);
+        Image icon = new ImageIcon(getClass().getResource("/img/iconfehmex.png")).getImage();
+        setIconImage(icon);
+        this.setExtendedState(MAXIMIZED_BOTH);
+        try {
+            System.out.println("com  " + Arduino.getSerialPorts());
+            Arduino.arduinoRXTX("COM4", 9600, listener);
+            JOptionPane.showMessageDialog(null, "SI FUNCIONA");
+
+        } catch (ArduinoException ex) {
+            JOptionPane.showMessageDialog(null, "no se encontro arduino");
+            Logger.getLogger(LOGIN.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void acceder(String usuario, String pass) throws ArduinoException {
+        if(max1==0||max2==0){
+    JOptionPane.showMessageDialog(null, "No puede iniciar ya que el equipo sigue calibrandosé\n"
+                                      + "Espere a que la temperatura llegue a 138.9 °C o más.\n"
+                                      + "Espere a que la presión llegue a 350KP o más.\n"
+                                      + "Tanto la presión como temperatura estén en su estado normal podra iniciar sesión.", "Mensaje de información", JOptionPane.INFORMATION_MESSAGE);         
+        }else{
+        if (pass.contains("'") || pass.contains("\"") || pass.contains("delete") || pass.contains("from")) {
+            JOptionPane.showMessageDialog(null, "verifica tus datos insertados", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } else {
+            Conectar cc = new Conectar();
+            Connection cn = cc.conexion();
+            String cap = "";
+            String id = "";
+            String sql = "SELECT * FROM db_doctor WHERE n_usuario='" + usuario + "' && n_contrasena='" + pass + "'";
+            try {
+                Statement st = cn.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+                while (rs.next()) {
+                    cap = rs.getString("tipo_usuario");
+                    id = rs.getString("usuario_id");
+                }
+                if (cap.equals("moderador")) {
+                    this.setVisible(false);
+                    JOptionPane.showMessageDialog(null, "Bienvenido  " + Txt_Login.getText());
+                    Paciente_existente ini = new Paciente_existente();
+                    ini.lbl_usuario.setText("Usuario: " + usuario);
+                    ini.idI = id;
+                    ini.usuario_doctor = usuario;
+                    Arduino.killArduinoConnection();
+                    ini.setVisible(true);
+                    ini.pack();
+                }
+                {
+                    if (cap.equals("administrador")) {
+                        this.setVisible(false);
+                        JOptionPane.showMessageDialog(null, "Bienvenido  " + Txt_Login.getText());
+                        admin_presion adp = new admin_presion();
+//                ini.lbl_usuario.setText("Usuario: " + usuario);
+//                ini.idI=id;
+ Arduino.killArduinoConnection();
+                        adp.setVisible(true);
+                        adp.pack();
+                    } else if (!cap.equals("moderador") && !cap.equals("administrador")) {
+                        JOptionPane.showMessageDialog(null, "Usuario no encontrado verifica todos los datos ingresados", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+            } catch (SQLException ex) {
+                Logger.getLogger(LOGIN.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }}
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        panel2 = new org.edisoncor.gui.panel.Panel();
+        panelShadow1 = new org.edisoncor.gui.panel.PanelShadow();
+        panel1 = new org.edisoncor.gui.panel.Panel();
+        txt_temperatura = new javax.swing.JLabel();
+        txt_temperatura_equipo = new javax.swing.JLabel();
+        txt_presion = new javax.swing.JLabel();
+        txt_presion_equipo = new javax.swing.JLabel();
+        jButton10 = new javax.swing.JButton();
+        grupoa_texto = new javax.swing.JLabel();
+        jButton9 = new javax.swing.JButton();
+        grupob_texto = new javax.swing.JLabel();
+        barra_presion = new javax.swing.JProgressBar();
+        jSeparator1 = new javax.swing.JSeparator();
+        barra_presion1 = new javax.swing.JProgressBar();
+        panelShadow2 = new org.edisoncor.gui.panel.PanelShadow();
+        labelMetric1 = new org.edisoncor.gui.label.LabelMetric();
+        jLabel1 = new javax.swing.JLabel();
+        Txt_Login = new org.edisoncor.gui.textField.TextFieldRectIcon();
+        jLabel2 = new javax.swing.JLabel();
+        Password_Login = new org.edisoncor.gui.passwordField.PasswordFieldRectIcon();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        grupoa_texto1 = new javax.swing.JLabel();
+        grupoa_texto2 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
+        grupoa_texto3 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("INICIO DE SESIÓN");
+
+        panel2.setColorPrimario(new java.awt.Color(0, 255, 255));
+        panel2.setColorSecundario(new java.awt.Color(0, 51, 153));
+        panel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/escrtorio.jpg"))); // NOI18N
+        panel2.setPreferredSize(new java.awt.Dimension(940, 579));
+
+        panelShadow1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        panel1.setColorPrimario(new java.awt.Color(255, 255, 255));
+        panel1.setColorSecundario(new java.awt.Color(0, 102, 255));
+        panel1.setGradiente(org.edisoncor.gui.panel.Panel.Gradiente.CIRCULAR);
+        panel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/escrtorio.jpg"))); // NOI18N
+
+        txt_temperatura.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        txt_temperatura.setForeground(new java.awt.Color(0, 0, 255));
+        txt_temperatura.setText("TEMPERATURA DEL EQUIPO:");
+
+        txt_temperatura_equipo.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        txt_temperatura_equipo.setForeground(new java.awt.Color(153, 0, 0));
+        txt_temperatura_equipo.setText("12.36");
+
+        txt_presion.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        txt_presion.setForeground(new java.awt.Color(0, 0, 255));
+        txt_presion.setText("PRESIÓN DEL EQUIPO:");
+
+        txt_presion_equipo.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        txt_presion_equipo.setForeground(new java.awt.Color(153, 0, 0));
+        txt_presion_equipo.setText("30.2");
+
+        jButton10.setBackground(new java.awt.Color(0, 204, 0));
+        jButton10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        grupoa_texto.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        grupoa_texto.setForeground(new java.awt.Color(0, 0, 255));
+        grupoa_texto.setText("Nivel de agua alto.");
+
+        jButton9.setBackground(new java.awt.Color(204, 0, 0));
+        jButton9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        grupob_texto.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        grupob_texto.setForeground(new java.awt.Color(0, 0, 255));
+        grupob_texto.setText("Nivel de agua bajo.");
+
+        barra_presion.setBackground(new java.awt.Color(255, 255, 255));
+        barra_presion.setForeground(new java.awt.Color(204, 0, 0));
+        barra_presion.setMaximum(350);
+        barra_presion.setOrientation(1);
+        barra_presion.setStringPainted(true);
+
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+        barra_presion1.setForeground(new java.awt.Color(204, 0, 0));
+        barra_presion1.setMaximum(139);
+        barra_presion1.setOrientation(1);
+        barra_presion1.setStringPainted(true);
+
+        panelShadow2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        labelMetric1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        labelMetric1.setText("LOGIN");
+        labelMetric1.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("USUARIO:");
+
+        Txt_Login.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        Txt_Login.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/usuario.png"))); // NOI18N
+        Txt_Login.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Txt_LoginActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("CONTRASEÑA:");
+
+        Password_Login.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        Password_Login.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/password1.jpg"))); // NOI18N
+        Password_Login.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                Password_LoginKeyPressed(evt);
+            }
+        });
+
+        jButton1.setText("Ingresar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelShadow2Layout = new javax.swing.GroupLayout(panelShadow2);
+        panelShadow2.setLayout(panelShadow2Layout);
+        panelShadow2Layout.setHorizontalGroup(
+            panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelShadow2Layout.createSequentialGroup()
+                .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelShadow2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Txt_Login, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(Password_Login, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(panelShadow2Layout.createSequentialGroup()
+                        .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelShadow2Layout.createSequentialGroup()
+                                .addGap(44, 44, 44)
+                                .addComponent(labelMetric1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelShadow2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 36, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1)))
+                .addContainerGap())
+        );
+        panelShadow2Layout.setVerticalGroup(
+            panelShadow2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelShadow2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(labelMetric1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addGap(8, 8, 8)
+                .addComponent(Txt_Login, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addGap(7, 7, 7)
+                .addComponent(Password_Login, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(17, Short.MAX_VALUE))
+        );
+
+        jButton2.setBackground(new java.awt.Color(204, 0, 0));
+
+        jButton3.setBackground(new java.awt.Color(255, 255, 0));
+
+        grupoa_texto1.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        grupoa_texto1.setForeground(new java.awt.Color(0, 0, 255));
+        grupoa_texto1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        grupoa_texto1.setText("Nivel bajo.");
+
+        grupoa_texto2.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        grupoa_texto2.setForeground(new java.awt.Color(0, 0, 255));
+        grupoa_texto2.setText("Nivel Adecuado.");
+
+        jButton4.setBackground(new java.awt.Color(0, 204, 0));
+
+        grupoa_texto3.setFont(new java.awt.Font("Arial Black", 0, 12)); // NOI18N
+        grupoa_texto3.setForeground(new java.awt.Color(0, 0, 255));
+        grupoa_texto3.setText("Nivel alto adecuado");
+
+        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
+        panel1.setLayout(panel1Layout);
+        panel1Layout.setHorizontalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txt_temperatura)
+                    .addComponent(txt_temperatura_equipo)
+                    .addComponent(txt_presion, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_presion_equipo)
+                    .addGroup(panel1Layout.createSequentialGroup()
+                        .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(grupoa_texto))
+                    .addGroup(panel1Layout.createSequentialGroup()
+                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(grupob_texto)))
+                .addGap(28, 28, 28)
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(barra_presion1, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                    .addComponent(barra_presion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 153, Short.MAX_VALUE)
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(panel1Layout.createSequentialGroup()
+                            .addComponent(grupoa_texto1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton2))
+                        .addGroup(panel1Layout.createSequentialGroup()
+                            .addComponent(grupoa_texto2)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton3)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel1Layout.createSequentialGroup()
+                        .addComponent(grupoa_texto3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(panelShadow2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        panel1Layout.setVerticalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSeparator1)
+            .addGroup(panel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel1Layout.createSequentialGroup()
+                        .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panel1Layout.createSequentialGroup()
+                                .addComponent(txt_temperatura)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_temperatura_equipo))
+                            .addComponent(barra_presion1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panel1Layout.createSequentialGroup()
+                                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(grupoa_texto1, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
+                                    .addComponent(grupoa_texto2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(grupoa_texto3, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(18, 18, 18)
+                        .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(panel1Layout.createSequentialGroup()
+                                .addComponent(barra_presion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(panel1Layout.createSequentialGroup()
+                                .addComponent(txt_presion)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txt_presion_equipo)
+                                .addGap(41, 41, 41)
+                                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(panel1Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(grupoa_texto)
+                                        .addGap(69, 69, 69)
+                                        .addComponent(grupob_texto)
+                                        .addGap(9, 9, 9))
+                                    .addGroup(panel1Layout.createSequentialGroup()
+                                        .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(33, 33, 33)
+                                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap())))
+                    .addGroup(panel1Layout.createSequentialGroup()
+                        .addComponent(panelShadow2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+
+        javax.swing.GroupLayout panelShadow1Layout = new javax.swing.GroupLayout(panelShadow1);
+        panelShadow1.setLayout(panelShadow1Layout);
+        panelShadow1Layout.setHorizontalGroup(
+            panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelShadow1Layout.setVerticalGroup(
+            panelShadow1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelShadow1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("BIENVENIDO ");
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/iconfel100.png"))); // NOI18N
+
+        javax.swing.GroupLayout panel2Layout = new javax.swing.GroupLayout(panel2);
+        panel2.setLayout(panel2Layout);
+        panel2Layout.setHorizontalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel2Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(136, 136, 136)
+                        .addComponent(jLabel3)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(panelShadow1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        panel2Layout.setVerticalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel2Layout.createSequentialGroup()
+                .addGroup(panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel4))
+                    .addGroup(panel2Layout.createSequentialGroup()
+                        .addGap(56, 56, 56)
+                        .addComponent(jLabel3)))
+                .addGap(31, 31, 31)
+                .addComponent(panelShadow1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1025, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panel2, javax.swing.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+String global;
+
+    private SerialPortEventListener listener = new SerialPortEventListener() {
+        @Override
+        public void serialEvent(SerialPortEvent spe) {
+            try {
+
+                 global = Arduino.printMessage().toString();
+//                 System.out.println("esto daaa: "+global);
+                if (global.charAt(0) == 'p') {
+                    System.out.println("hola el primer digito es P " + global);
+                    global = global.replace("p", "");
+                    System.out.println("hola el primer digito es P " + global);
+                    int d = Integer.parseInt(global);
+                    PT100_GENERADOR pt = new PT100_GENERADOR();
+                    pt.main_pt100(d);
+                    DecimalFormat df = new DecimalFormat("0.00");
+
+                    txt_temperatura_equipo.setText("" + df.format(pt.T) + " °C");
+                       barra_presion1.setValue((int) pt.T);
+                   if(pt.temp_maxima==1){
+                       max1=1;
+                        barra_presion1.setForeground(Color.YELLOW);
+                   }
+                } else if (global.charAt(0) == 's') {
+                    System.out.println("hola el primer digito es S " + global);
+                    global = global.replace("s", "");
+                    int d = Integer.parseInt(global);
+                    PRESION pre = new PRESION();
+                    pre.main_presion(d);
+                    DecimalFormat kp = new DecimalFormat("0.000");
+                    txt_presion_equipo.setText("" + kp.format(pre.p) + " Kpascal");
+                      barra_presion.setValue((int) pre.p);
+                    if(pre.temp_maxima==1){
+                       max2=1;
+                       barra_presion.setForeground(Color.YELLOW);
+                   }
+                } else if (global.charAt(0) == 't') {
+                    System.out.println("hola el primer digito es T " + global);
+                }
+//                    txt_valor.setText(""+Arduino.receiveData());
+                global = "";
+            } catch (SerialPortException | ArduinoException ex) {
+                Logger.getLogger(LOGIN.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    };
+    private void Password_LoginKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_Password_LoginKeyPressed
+        if (evt.getKeyCode() == Event.ENTER) {
+            String usu = Txt_Login.getText();
+            String pas = new String(Password_Login.getPassword());
+            try {
+                acceder(usu, pas);
+//            acceder(usu, pas);
+            } catch (ArduinoException ex) {
+                Logger.getLogger(LOGIN.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_Password_LoginKeyPressed
+
+    private void Txt_LoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Txt_LoginActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Txt_LoginActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String usu = Txt_Login.getText();
+        String pas = new String(Password_Login.getPassword());
+        try {
+            acceder(usu, pas);
+        } catch (ArduinoException ex) {
+            Logger.getLogger(LOGIN.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(LOGIN.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new LOGIN().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.edisoncor.gui.passwordField.PasswordFieldRectIcon Password_Login;
+    private org.edisoncor.gui.textField.TextFieldRectIcon Txt_Login;
+    private javax.swing.JProgressBar barra_presion;
+    private javax.swing.JProgressBar barra_presion1;
+    private javax.swing.JLabel grupoa_texto;
+    private javax.swing.JLabel grupoa_texto1;
+    private javax.swing.JLabel grupoa_texto2;
+    private javax.swing.JLabel grupoa_texto3;
+    private javax.swing.JLabel grupob_texto;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JSeparator jSeparator1;
+    private org.edisoncor.gui.label.LabelMetric labelMetric1;
+    private org.edisoncor.gui.panel.Panel panel1;
+    private org.edisoncor.gui.panel.Panel panel2;
+    private org.edisoncor.gui.panel.PanelShadow panelShadow1;
+    private org.edisoncor.gui.panel.PanelShadow panelShadow2;
+    private javax.swing.JLabel txt_presion;
+    private javax.swing.JLabel txt_presion_equipo;
+    private javax.swing.JLabel txt_temperatura;
+    private javax.swing.JLabel txt_temperatura_equipo;
+    // End of variables declaration//GEN-END:variables
+}
